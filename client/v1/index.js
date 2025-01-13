@@ -28,7 +28,9 @@ console.log(MY_FAVORITE_DEALERS[0]);
 // 🎯 TODO 1: The highest reduction
 // 0. I have 2 favorite lego sets shopping communities stored in MY_FAVORITE_DEALERS variable
 // 1. Create a new variable and assign it the link of the lego set with the highest reduction I can find on these 2 websites
+const highestReductionLink = 'https://www.dealabs.com/bons-plans/precommande-lego-technic-42207-ferrari-sf-24-f1-2960166';
 // 2. Log the variable
+console.log('highestReductionLink : ' + highestReductionLink);
 
 /**
  * 🧱
@@ -41,17 +43,27 @@ console.log(MY_FAVORITE_DEALERS[0]);
 
 // 🎯 TODO 2: Number of deals
 // 1. Create a variable and assign it the number of deals
+const numberOfDeals = deals.length;
 // 2. Log the variable
+console.log('numberOfDeals : ' + numberOfDeals);
 
 // 🎯 TODO 3: Website name
 // 1. Create a variable and assign it the list of shopping community name only
+const communityNames = MY_FAVORITE_DEALERS.map(dealer => dealer.name);
 // 2. Log the variable
+console.log('communityNames : '+ communityNames)
 // 3. Log how many shopping communities we have
+console.log('communityNames Count : ', communityNames.length);
 
 // 🎯 TODO 4: Sort by price
 // 1. Create a function to sort the deals by price
+function sortDealsByPrice(deals) {
+  return deals.slice().sort((a, b) => a.price - b.price); 
+}
 // 2. Create a variable and assign it the list of sets by price from lowest to highest
+const sortedDeals = sortDealsByPrice(deals);
 // 3. Log the variable
+console.log('sortedDeals : ', sortedDeals);
 
 // 🎯 TODO 5: Sort by date
 // 1. Create a function to sort the deals by date
@@ -60,11 +72,15 @@ console.log(MY_FAVORITE_DEALERS[0]);
 
 // 🎯 TODO 6: Filter a specific percentage discount range
 // 1. Filter the list of deals between 50% and 75%
+const filteredDeals = deals.filter(deal => deal.discount >= 50 && deal.discount <= 75);
 // 2. Log the list
+console.log('filteredDeals : ' + filteredDeals);
 
 // 🎯 TODO 7: Average percentage discount
 // 1. Determine the average percentage discount of the deals
+const averageDiscount = deals.reduce((sum, deal) => sum + deal.discount, 0) / deals.length;
 // 2. Log the average
+console.log('averageDiscount : ' + averageDiscount);
 
 /**
  * 🏎
