@@ -67,8 +67,13 @@ console.log('sortedDeals : ', sortedDeals);
 
 // 🎯 TODO 5: Sort by date
 // 1. Create a function to sort the deals by date
+function sortDealsByDate(deals) {
+  return deals.slice().sort((a, b) => new Date(b.date) - new Date(a.date)); // Convertit les dates en objets Date
+}
 // 2. Create a variable and assign it the list of deals by date from recent to old
+const sortedByDate = sortDealsByDate(deals);
 // 3. Log the variable
+console.log('sortedByDate : ' + sortedByDate);
 
 // 🎯 TODO 6: Filter a specific percentage discount range
 // 1. Filter the list of deals between 50% and 75%
@@ -101,9 +106,22 @@ console.log('averageDiscount : ' + averageDiscount);
 //   ....
 //   'community-name-n': [{...}, {...}, ..., {...}],
 // };
-//
+const communities = {};
+deals.forEach(deal => {
+  const communityName = deal.community; // Supposons que chaque offre a une propriété `community`
+  if (!communities[communityName]) {
+      communities[communityName] = [];
+  }
+  communities[communityName].push(deal);
+});
 // 2. Log the variable
+console.log('communities:', communities);
 // 3. Log the number of deals by community
+for (const communityName in communities) {
+  if (communities.hasOwnProperty(communityName)) {
+      console.log(`Number of deals in ${communityName}: ${communities[communityName].length}`);
+  }
+}
 
 // 🎯 TODO 9: Sort by price for each community
 // 1. For each community, sort the deals by discount price, from highest to lowest
