@@ -68,7 +68,7 @@ console.log('sortedDeals : ', sortedDeals);
 // 🎯 TODO 5: Sort by date
 // 1. Create a function to sort the deals by date
 function sortDealsByDate(deals) {
-  return deals.slice().sort((a, b) => new Date(b.date) - new Date(a.date)); // Convertit les dates en objets Date
+  return deals.slice().sort((a, b) => new Date(b.published) - new Date(a.published)); // Convertit les dates en objets Date
 }
 // 2. Create a variable and assign it the list of deals by date from recent to old
 const sortedByDate = sortDealsByDate(deals);
