@@ -13,12 +13,10 @@
 ## Main problem we are solving for
 
 * Create a website that predicts whether a Lego deal is profitable
-* 
+* Prediction Accuraty / User Satisfaction / Data Quality
 
 ## Measures of the success
 
 ## List of visual aspects convictions
 
 ## List of interaction patterns convictions
-
-
