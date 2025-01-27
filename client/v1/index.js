@@ -449,7 +449,6 @@ function getPercentile(data, percentile) {
   const weight = index - lower;
   return data[lower] * (1 - weight) + data[upper] * weight;
 }
-
 const prices = VINTED.map(item => parseFloat(item.price));
 const p5Price = getPercentile(prices, 5);
 // 3. Compute the p25 price value of the listing
