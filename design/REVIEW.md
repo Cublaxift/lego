@@ -6,7 +6,14 @@
 
 ## List of taken considerations for sketches/design
 
+* 1 - Make it easy to read
+* 2 - Make it easy to use
+* 3 - Make it friendly for everyone
+
 ## Main problem we are solving for
+
+* Create a website that predicts whether a Lego deal is profitable
+* 
 
 ## Measures of the success
 
