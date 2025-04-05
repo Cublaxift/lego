@@ -17,6 +17,19 @@
 
 ## Measures of the success
 
+* Page load time < 2 seconds
+* User satisfaction score > 4.5/5 in testing sessions
+* Prediction accuracy > 85%
+
 ## List of visual aspects convictions
 
+* Use of clear color codes (green for low risk...) to support intuitive understanding
+* Minimalistic design with focus on essential data (price, risk, ID)
+* Balanced whitespace to improve readability
+* Use of rounded cards to create a friendly, modern look
+
 ## List of interaction patterns convictions
+
+* Use of sorting and filtering for quick navigation
+* Smooth scrolling or pagination to explore longer lists
+* Hover tooltips for detailed explanations of metrics like P10, P70
