@@ -83,14 +83,11 @@ const renderDeals = deals => {
       const isFavorite = favoriteDeals.some(fav => fav.uuid === deal.uuid);
       return `
       <div class="deal" id=${deal.uuid}>
+        <button class="favorite-btn" data-id="${deal.uuid}">${isFavorite ? '✖️' : '⭐'}</button>
         <span>${deal.id}</span>
         <a href="${deal.link}" target="_blank">${deal.title}</a>
         <span>${deal.price}€,</span>
-        <span>${deal.discount}% off,</span>
-        <span>${deal.comments} comments,</span>
-        <span>${deal.temperature}°,</span>
-        <span>${deal.published}</span>
-        <button class="favorite-btn" data-id="${deal.uuid}">${isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}</button>
+        <span>${deal.discount}% discount</span>
       </div>
     `;
     })
