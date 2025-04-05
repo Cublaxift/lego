@@ -31,10 +31,7 @@ const selectPage = document.querySelector('#page-select');
 const selectLegoSetIds = document.querySelector('#lego-set-id-select');
 const sectionDeals= document.querySelector('#deals');
 const spanNbDeals = document.querySelector('#nbDeals');
-const buttonFilterDiscount = document.querySelector('#filter-discount');
-const buttonFilterCommented = document.querySelector('#filter-commented');
-const buttonFilterHotDeals = document.querySelector('#filter-hot-deals');
-const selectSort = document.querySelector('#sort-select');
+const filterDiscount = document.querySelector('#discount-filter');
 
 /**
  * Set global value
@@ -50,6 +47,7 @@ const setCurrentDeals = ({result, meta}) => {
  * Fetch deals from api
  * @param  {Number}  [page=1] - current page to fetch
  * @param  {Number}  [size=12] - size of the page
+ * @param  {Number}  [discount=0] - minimum discount percentage to filter deals
  * @return {Object}
  */
 const fetchDeals = async (page = 1, size = 6) => {
@@ -73,18 +71,26 @@ const fetchDeals = async (page = 1, size = 6) => {
 
 /**
  * Render list of deals
- * @param  {Array} deals
+ * @param {Array} deals
  */
 const renderDeals = deals => {
+  const dealsToRender = showOnlyFavorites ? favoriteDeals : deals;
+
   const fragment = document.createDocumentFragment();
   const div = document.createElement('div');
-  const template = deals
+  const template = dealsToRender
     .map(deal => {
+      const isFavorite = favoriteDeals.some(fav => fav.uuid === deal.uuid);
       return `
       <div class="deal" id=${deal.uuid}>
         <span>${deal.id}</span>
-        <a href="${deal.link}">${deal.title}</a>
-        <span>${deal.price}</span>
+        <a href="${deal.link}" target="_blank">${deal.title}</a>
+        <span>${deal.price}€,</span>
+        <span>${deal.discount}% off,</span>
+        <span>${deal.comments} comments,</span>
+        <span>${deal.temperature}°,</span>
+        <span>${deal.published}</span>
+        <button class="favorite-btn" data-id="${deal.uuid}">${isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}</button>
       </div>
     `;
     })
@@ -94,6 +100,10 @@ const renderDeals = deals => {
   fragment.appendChild(div);
   sectionDeals.innerHTML = '<h2>Deals</h2>';
   sectionDeals.appendChild(fragment);
+
+  document.querySelectorAll('.favorite-btn').forEach(button => {
+    button.addEventListener('click', handleFavoriteClick);
+  });
 };
 
 /**
@@ -142,60 +152,6 @@ const render = (deals, pagination) => {
 };
 
 /**
- * Filter deals by best discount (> 50%)
- */
-const filterByBestDiscount = (deals) => {
-  return deals.filter(deal => deal.discount && deal.discount > 50);
-};
-
-/**
- * Filter deals by most commented (> 15 comments)
- */
-const filterByMostCommented = (deals) => {
-  return deals.filter(deal => deal.comments && deal.comments > 15);
-};
-
-/**
- * Filter deals by hot deals (temperature > 100)
- */
-const filterByHotDeals = (deals) => {
-  return deals.filter(deal => deal.temperature && deal.temperature > 100);
-};
-
-
-/**
- * Sort deals by price (ascending or descending)
- */
-const sortByPrice = (deals, order) => {
-  return deals.sort((a, b) => {
-    if (order === 'price-asc') {
-      return a.price - b.price;
-    } else if (order === 'price-desc') {
-      return b.price - a.price;
-    }
-    return 0; 
-  });
-};
-
-/**
- * Sort deals by date (ascending or descending)
- */
-const sortByDate = (deals, order) => {
-  return deals.sort((a, b) => {
-    const dateA = new Date(a.published);
-    const dateB = new Date(b.published);
-    
-    if (order === 'date-asc') {
-      return dateB - dateA;
-    } else if (order === 'date-desc') {
-      return dateA - dateB;
-    }
-    return 0;
-  });
-};
-
-
-/**
  * Declaration of all Listeners
  */
 
@@ -209,53 +165,369 @@ selectShow.addEventListener('change', async (event) => {
   render(currentDeals, currentPagination);
 });
 
+/**
+ * Select the number of the page to display
+ */
 selectPage.addEventListener('change', async (event) => {
-  const selectedPage = parseInt(event.target.value); 
-  const deals = await fetchDeals(selectedPage, parseInt(selectShow.value) || 6);
+  const deals = await fetchDeals(parseInt(event.target.value), selectShow.value);
 
-  setCurrentDeals(deals); 
-  render(currentDeals, currentPagination); 
+  setCurrentDeals(deals);
+  render(currentDeals, currentPagination);
 });
 
-buttonFilterDiscount.addEventListener('click', async () => {
-  const deals = currentDeals.length > 0 ? currentDeals : (await fetchDeals(currentPagination.currentPage, parseInt(selectShow.value) || 6)).result;
-
-  const filteredDeals = filterByBestDiscount(deals);
-  render(filteredDeals, currentPagination);
-});
-
-buttonFilterCommented.addEventListener('click', async () => {
-  const deals = currentDeals.length > 0 ? currentDeals : (await fetchDeals(currentPagination.currentPage, parseInt(selectShow.value) || 6)).result;
-
-  const filteredDeals = filterByMostCommented(deals);
-  render(filteredDeals, currentPagination);
-});
-
-buttonFilterHotDeals.addEventListener('click', async () => {
-  const deals = currentDeals.length > 0 ? currentDeals : (await fetchDeals(currentPagination.currentPage, parseInt(selectShow.value) || 6)).result;
-
-  const filteredDeals = filterByHotDeals(deals);
-  render(filteredDeals, currentPagination);
-});
-
-selectSort.addEventListener('change', async (event) => {
-  const order = event.target.value;
-  let deals = currentDeals.length > 0 ? currentDeals : (await fetchDeals(currentPagination.currentPage, parseInt(selectShow.value) || 6)).result;
-
-  if (order.includes('price')) {
-    deals = sortByPrice(deals, order);
-  } else if (order.includes('date')) {
-    deals = sortByDate(deals, order);
-  }
-
-  render(deals, currentPagination);
-});
-
-
-
+/**
+ * Initialize application on page load
+ */
 document.addEventListener('DOMContentLoaded', async () => {
   const deals = await fetchDeals();
 
   setCurrentDeals(deals);
   render(currentDeals, currentPagination);
+});
+
+const filterDiscountButton = document.querySelector('#filters button:first-of-type');
+filterDiscountButton.addEventListener('click', async () => {
+  const deals = await fetchDeals(currentPagination.currentPage, selectShow.value);
+  const filteredDeals = deals.result.filter(deal => deal.discount > 50);
+  const filteredPagination = {
+    ...currentPagination,
+    count: filteredDeals.length,
+    pageCount: Math.ceil(filteredDeals.length / selectShow.value),
+  };
+
+  setCurrentDeals({ result: filteredDeals, meta: filteredPagination });
+  render(currentDeals, filteredPagination);
+});
+
+const sortSelect = document.querySelector('#sort-select');
+
+sortSelect.addEventListener('change', async (event) => {
+  const sortOption = event.target.value;
+  if (sortOption === 'discount-asc') {
+    const sortedDeals = sortDealsByDiscount([...currentDeals], 'desc');
+    render(sortedDeals, currentPagination);
+  }
+});
+
+/**
+ * Sort deals by discount
+ * @param {Array} deals - List of deals
+ * @param {String} order - Order of sorting ('desc' for best discount first)
+ * @return {Array}
+ */
+const sortDealsByDiscount = (deals, order = 'desc') => {
+  return deals.sort((a, b) => {
+    if (order === 'desc') {
+      return b.discount - a.discount;
+    }
+    return a.discount - b.discount;
+  });
+};
+
+const filterCommentsButton = document.querySelector('#filters button:nth-of-type(2)');
+filterCommentsButton.addEventListener('click', async () => {
+  const deals = await fetchDeals(currentPagination.currentPage, selectShow.value);
+  const filteredDeals = deals.result.filter(deal => deal.comments > 15);
+  const filteredPagination = {
+    ...currentPagination,
+    count: filteredDeals.length,
+    pageCount: Math.ceil(filteredDeals.length / selectShow.value),
+  };
+
+  setCurrentDeals({ result: filteredDeals, meta: filteredPagination });
+  render(currentDeals, filteredPagination);
+});
+
+const sortDealsByComments = (deals, order = 'desc') => {
+  return deals.sort((a, b) => {
+    if (order === 'desc') {
+      return b.comments - a.comments;
+    }
+    return a.comments - b.comments; 
+  });
+};
+
+const sortSelect2 = document.querySelector('#sort-select');
+sortSelect2.addEventListener('change', async (event) => {
+  const sortOption = event.target.value;
+  if (sortOption === 'comments-desc') {
+    const sortedDeals = sortDealsByComments([...currentDeals], 'desc');
+    render(sortedDeals, currentPagination);
+  }
+});
+
+
+const filterHotDealsButton = document.querySelector('#filters button:nth-of-type(3)');
+filterHotDealsButton.addEventListener('click', async () => {
+  const deals = await fetchDeals(currentPagination.currentPage, selectShow.value);
+  const filteredDeals = deals.result.filter(deal => deal.temperature > 100);
+  const filteredPagination = {
+    ...currentPagination,
+    count: filteredDeals.length,
+    pageCount: Math.ceil(filteredDeals.length / selectShow.value),
+  };
+
+  setCurrentDeals({ result: filteredDeals, meta: filteredPagination });
+  render(currentDeals, filteredPagination);
+});
+
+const sortSelect3 = document.querySelector('#sort-select');
+sortSelect3.addEventListener('change', async (event) => {
+  const sortOption = event.target.value;
+  if (sortOption === 'temperature-desc') {
+    const sortedDeals = sortDealsByTemperature([...currentDeals], 'desc');
+    render(sortedDeals, currentPagination);
+  }
+});
+
+/**
+ * Sort deals by temperature
+ * @param {Array} deals
+ * @param {String} order
+ * @return {Array}
+ */
+const sortDealsByTemperature = (deals, order = 'desc') => {
+  return deals.sort((a, b) => {
+    if (order === 'desc') {
+      return b.temperature - a.temperature;
+    }
+    return a.temperature - b.temperature;
+  });
+};
+
+sortSelect.addEventListener('change', async (event) => {
+  const sortOption = event.target.value;
+
+  if (sortOption === 'price-asc') {
+    const sortedDeals = sortDealsByPrice([...currentDeals], 'asc');
+    render(sortedDeals, currentPagination);
+  } else if (sortOption === 'price-desc') {
+    const sortedDeals = sortDealsByPrice([...currentDeals], 'desc');
+    render(sortedDeals, currentPagination);
+  }
+});
+
+/**
+ * Sort deals by price
+ * @param {Array} deals
+ * @param {String} order
+ * @return {Array}
+ */
+const sortDealsByPrice = (deals, order = 'asc') => {
+  return deals.sort((a, b) => {
+    if (order === 'asc') {
+      return a.price - b.price;
+    }
+    return b.price - a.price;
+  });
+};
+
+sortSelect.addEventListener('change', async (event) => {
+  const sortOption = event.target.value;
+  if (sortOption === 'date-asc') {
+    const sortedDeals = sortDealsByDate([...currentDeals], 'asc');
+    render(sortedDeals, currentPagination);
+  } else if (sortOption === 'date-desc') {
+    const sortedDeals = sortDealsByDate([...currentDeals], 'desc');
+    render(sortedDeals, currentPagination);
+  }
+});
+
+/**
+ * Sort deals by price
+ * @param {Array} deals
+ * @param {String} order
+ * @return {Array}
+ */
+const sortDealsByDate = (deals, order = 'asc') => {
+  return deals.sort((a, b) => {
+    if (order === 'asc') {
+      return a.price - b.price;
+    }
+    return b.price - a.price;
+  });
+};
+
+let currentSales = [];
+
+const sectionSales= document.querySelector('#sales');
+
+/**
+ * Set global value
+ * @param {Array} result - sales to display
+ */
+const setCurrentSales = ({result}) => {
+  currentSales = result;
+};
+
+/**
+ * Fetch sales from api
+ * @param  {Number}  [id=42182] - id to fetch
+ * @return {Object}
+ */
+const fetchSales = async (id = 42182) => {
+  try {
+    const response = await fetch(
+      `https://lego-api-blue.vercel.app/sales?id=${id}`
+    );
+    const body = await response.json();
+
+    if (body.success !== true) {
+      console.error(body);
+      return {currentSales, currentPagination};
+    }
+
+    return body.data;
+  } catch (error) {
+    console.error(error);
+    return {currentSales, currentPagination};
+  }
+};
+
+/**
+ * Render list of sales
+ * @param  {Array} sales
+ */
+const renderSales = sales => {
+  if (!sectionSales) {
+    console.error("Section 'Sales' not found in the DOM.");
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  const div = document.createElement('div');
+  const template = sales
+    .map(sale => {
+      return `
+      <div class="sale" id=${sale.uuid},>
+        <a href="${sale.link}" target="_blank">${sale.title}</a>
+        <span>${sale.price}€,</span>
+        <span>${sale.published}</span>
+      </div>
+    `;
+    })
+    .join('');
+
+  div.innerHTML = template;
+  fragment.appendChild(div);
+  sectionSales.innerHTML = '<h2>Sales</h2>';
+  sectionSales.appendChild(fragment);
+};
+
+const renderS = (sales) => {
+  renderSales(sales);
+  renderIndicatorsSales(sales);
+};
+
+selectLegoSetIds.addEventListener('change', async (event) => {
+  const sales = await fetchSales(parseInt(event.target.value));
+
+  setCurrentSales(sales);
+  renderS(currentSales);
+});
+
+const spanNbSales = document.querySelector('#nbSales');
+const renderIndicatorsSales = (sales) => {
+  spanNbSales.innerHTML = sales.length;
+  spanP5Value.innerHTML = calculatePercentile(sales, 5);
+  spanP25Value.innerHTML = calculatePercentile(sales, 25);
+  spanP50Value.innerHTML = calculatePercentile(sales, 50);
+  spanLifetimeValue.innerHTML = calculateLifetimeValue(sales);
+};
+
+const spanP5Value = document.querySelector('#p5_value');
+const spanP25Value = document.querySelector('#p25_value');
+const spanP50Value = document.querySelector('#p50_value');
+
+function calculatePercentile(sales, percentile) {
+  if (sales.length === 0) {
+    return 0;
+  }
+  const prices = sales.map(sale => sale.price);
+  prices.sort((a, b) => a - b);
+  const index = (percentile / 100) * (prices.length - 1);
+  const lower = Math.floor(index);
+  const upper = Math.ceil(index);
+  if (lower === upper) {
+    return prices[index];
+  }
+  const lowerValue = prices[lower];
+  const upperValue = prices[upper];
+
+  return lowerValue + (upperValue - lowerValue) * (index - lower);
+}
+
+const spanLifetimeValue = document.querySelector('#LifeTimeValue');
+
+function calculateLifetimeValue(sales) {
+  if (sales.length === 0) {
+    return 0;
+  }
+
+  const now = new Date();
+  let totalDays = 0;
+
+  sales.forEach(sale => {
+    const publishedDate = new Date(sale.published);
+    const differenceInTime = now - publishedDate;
+    const differenceInDays = differenceInTime / (1000 * 3600 * 24); // Convert milliseconds to days
+    totalDays += differenceInDays;
+  });
+
+  return totalDays / sales.length;
+}
+
+let favoriteDeals = [];
+
+/**
+ * Handle favorite button click
+ * @param {Event} event
+ */
+const handleFavoriteClick = event => {
+  const dealId = event.target.getAttribute('data-id');
+  const deal = currentDeals.find(d => d.uuid === dealId);
+
+  if (deal) {
+    const isFavorite = favoriteDeals.some(fav => fav.uuid === dealId);
+    if (isFavorite) {
+      favoriteDeals = favoriteDeals.filter(fav => fav.uuid !== dealId);
+    } else {
+      favoriteDeals.push(deal);
+    }
+    renderFavorites();
+    renderDeals(currentDeals);
+  }
+};
+
+const renderFavorites = () => {
+  const favoriteSection = document.querySelector('#favorites');
+  const fragment = document.createDocumentFragment();
+  const div = document.createElement('div');
+  const template = favoriteDeals
+    .map(deal => {
+      return `
+      <div class="deal" id=${deal.uuid}>
+        <span>${deal.id}</span>
+        <a href="${deal.link}" target="_blank">${deal.title}</a>
+        <span>${deal.price}€,</span>
+        <span>${deal.discount}% off,</span>
+        <span>${deal.comments} comments,</span>
+        <span>${deal.temperature}°,</span>
+        <span>${deal.published}</span>
+      </div>
+    `;
+    })
+    .join('');
+
+  div.innerHTML = template;
+  fragment.appendChild(div);
+  favoriteSection.innerHTML = '<h2>Favorite Deals</h2>';
+  favoriteSection.appendChild(fragment);
+};
+
+let showOnlyFavorites = false;
+
+document.querySelector('#filter-favorites-btn').addEventListener('click', () => {
+  showOnlyFavorites = !showOnlyFavorites;
+  renderDeals(currentDeals);
 });
