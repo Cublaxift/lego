@@ -5,103 +5,166 @@
   <title>🧱 Lego | Predictability of a Lego Set Deal</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-    }
-
-    h1, h2 {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
       color: #333;
     }
 
+    h1, h2 {
+      color: #444;
+      text-align: center;
+    }
+
+    .container {
+      width: 80%;
+      margin: 20px auto;
+      padding: 20px;
+      background: white;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+
     .deal, .sale {
-      padding: 10px;
-      margin-bottom: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 5px;
       display: flex;
       align-items: center;
       gap: 10px;
     }
 
     .favorite-btn {
-      background-color: #000;
+      background-color: #007BFF;
       color: white;
       border: none;
-      padding: 5px 10px;
+      padding: 10px 15px;
       cursor: pointer;
-      border-radius: 3px;
+      border-radius: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s;
     }
 
     .favorite-btn:hover {
-      background-color: #333;
+      background-color: #0056b3;
     }
 
     #options, #favorites, #deals, #sales {
-      margin-bottom: 20px;
+      margin-bottom: 30px;
+    }
+
+    #indicators {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .indicator {
+      flex: 1;
+      min-width: 150px;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      text-align: center;
+      background: #f9f9f9;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    select, button {
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 8px;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      transition: border-color 0.3s;
+    }
+
+    select:focus, button:focus {
+      border-color: #007BFF;
+      outline: none;
     }
   </style>
 </head>
 <body>
-  <h1>Lego</h1>
+  <div class="container">
+    <h1>Lego</h1>
 
-  <section id="options">
-    <div id="show">
-      <label for="show-select">Show:</label>
-      <select name="show" id="show-select">
-        <option value="6">6</option>
-        <option value="12">12</option>
-        <option value="24">24</option>
-      </select>
-    </div>
-    <div id="page">
-      <label for="page-select">Go to page:</label>
-      <select name="page" id="page-select"></select>
-    </div>
-    <div id="filters">
-      <button type="button">Discount > 50%</button>
-      <button type="button">Number of comments > 15</button>
-      <button type="button">Deal > 100°</button>
-      <button id="filter-favorites-btn" type="button">Show Favorites Only</button>
-    </div>
-    <div id="sort">
-      <label for="sort-select">Sort:</label>
-      <select name="sort" id="sort-select">
-        <option value="discount-asc">Best discount first</option>
-        <option value="comments-desc">Most commented first</option>
-        <option value="temperature-desc">Highest temperature first</option>
-        <option value="price-asc">Cheaper first</option>
-        <option value="price-desc">More expensive first</option>
-        <option value="date-asc">Most recently published first</option>
-        <option value="date-desc">Most anciently published first</option>
-      </select>
-    </div>
-  </section>
+    <section id="options">
+      <div id="show">
+        <label for="show-select">Show:</label>
+        <select name="show" id="show-select">
+          <option value="6">6</option>
+          <option value="12">12</option>
+          <option value="24">24</option>
+        </select>
+      </div>
+      <div id="page">
+        <label for="page-select">Go to page:</label>
+        <select name="page" id="page-select"></select>
+      </div>
+      <div id="filters">
+        <button type="button">Discount > 50%</button>
+        <button type="button">Number of comments > 15</button>
+        <button type="button">Deal > 100°</button>
+        <button id="filter-favorites-btn" type="button">Show Favorites Only</button>
+      </div>
+      <div id="sort">
+        <label for="sort-select">Sort:</label>
+        <select name="sort" id="sort-select">
+          <option value="discount-asc">Best discount first</option>
+          <option value="comments-desc">Most commented first</option>
+          <option value="temperature-desc">Highest temperature first</option>
+          <option value="price-asc">Cheaper first</option>
+          <option value="price-desc">More expensive first</option>
+          <option value="date-asc">Most recently published first</option>
+          <option value="date-desc">Most anciently published first</option>
+        </select>
+      </div>
+    </section>
 
-  <section id="lego">
-    <h2>Lego Sets</h2>
-    <div>
-      <label>Lego set id:</label>
-      <select id="lego-set-id-select"></select>
-    </div>
-  </section>
+    <section id="lego">
+      <h2>Lego Sets</h2>
+      <div>
+        <label>Lego set id:</label>
+        <select id="lego-set-id-select"></select>
+      </div>
+    </section>
 
-  <section id="indicators">
-    <h2>Indicators</h2>
-    <div><span>Number of deals</span> <span id="nbDeals">0</span></div>
-    <div><span>Number of sales</span> <span id="nbSales">0</span></div>
-    <div><span>p5 sales price value</span> <span id="p5Value">0</span></div>
-    <div><span>p25 sales price value</span> <span id="p25Value">0</span></div>
-    <div><span>p50 sales price value</span> <span id="p50Value">0</span></div>
-    <div><span>Lifetime value</span> <span id="lifetimeValue">10 days</span></div>
-  </section>
+    <section id="indicators">
+      <h2>Indicators</h2>
+      <div class="indicator">
+        <div><span>Number of deals</span> <span id="nbDeals">0</span></div>
+      </div>
+      <div class="indicator">
+        <div><span>Number of sales</span> <span id="nbSales">0</span></div>
+      </div>
+      <div class="indicator">
+        <div><span>p5 sales price value</span> <span id="p5Value">0</span></div>
+      </div>
+      <div class="indicator">
+        <div><span>p25 sales price value</span> <span id="p25Value">0</span></div>
+      </div>
+      <div class="indicator">
+        <div><span>p50 sales price value</span> <span id="p50Value">0</span></div>
+      </div>
+      <div class="indicator">
+        <div><span>Lifetime value</span> <span id="lifetimeValue">10 days</span></div>
+      </div>
+    </section>
 
-  <section id="favorites">
-    <h2>Favorite Deals</h2>
-  </section>
+    <section id="favorites">
+      <h2>Favorite Deals</h2>
+    </section>
 
-  <section id="deals"></section>
+    <section id="deals"></section>
 
-  <section id="sales">
-    <h2>Sales</h2>
-  </section>
+    <section id="sales">
+      <h2>Sales</h2>
+    </section>
+  </div>
 
   <script type="text/javascript" charset="UTF-8" src="utils.js"></script>
   <script type="text/javascript" charset="UTF-8" src="portfolio.js"></script>
