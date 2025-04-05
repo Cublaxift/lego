@@ -19,7 +19,7 @@ async function insertDeals(db) {
     const deals = JSON.parse(fs.readFileSync(filePath, 'utf8'));
 
     const result = await collection.insertMany(deals);
-    console.log(`✅ ${result.insertedCount} deals insérés`);
+    console.log(`${result.insertedCount} deals insérés`);
 }
 
 async function insertSales(db) {
@@ -38,7 +38,7 @@ async function insertSales(db) {
     }
 
     const result = await collection.insertMany(sales);
-    console.log(`✅ ${result.insertedCount} ventes insérées`);
+    console.log(`${result.insertedCount} ventes insérées`);
 }
 
 async function runQueries(db) {
@@ -90,12 +90,12 @@ async function runQueries(db) {
     }
 
     // Affichage des résultats
-    console.log("📜 5 best discount :\n", await findBestDiscountDeals());
-    console.log("📜 5 most commented deals :\n", await findMostCommentedDeals());
-    console.log("📜 all deals sorted by price :\n", await findDealsSortedByPrice('desc'));
-    console.log("📜 all deals sorted by date :\n", await findDealsSortedByDate());
-    console.log("📜 all sales for LEGO set ID 10363 :\n", await findSalesByLegoSetId('10363'));
-    console.log("📜 all sales scraped less than 3 weeks :\n", await findRecentSales());
+    console.log("5 best discount :\n", await findBestDiscountDeals());
+    console.log("5 most commented deals :\n", await findMostCommentedDeals());
+    console.log("all deals sorted by price :\n", await findDealsSortedByPrice('desc'));
+    console.log("all deals sorted by date :\n", await findDealsSortedByDate());
+    console.log("all sales for LEGO set ID 10363 :\n", await findSalesByLegoSetId('10363'));
+    console.log("all sales scraped less than 3 weeks :\n", await findRecentSales());
 }
 
 async function main() {
@@ -105,10 +105,10 @@ async function main() {
         await insertSales(db);
         await runQueries(db);
     } catch (error) {
-        console.error('❌ Erreur dans l\'exécution :', error);
+        console.error('Erreur dans l\'exécution :', error);
     } finally {
         await client.close();
-        console.log('🔌 Connexion MongoDB fermée');
+        console.log('Connexion MongoDB fermée');
     }
 }
 
