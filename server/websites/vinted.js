@@ -1,3 +1,4 @@
+// vinted.js
 import { v5 as uuidv5 } from 'uuid';
 
 const parse = data => {
@@ -23,7 +24,7 @@ const parse = data => {
   }
 };
 
-const scrape = async searchText => {
+export const scrape = async searchText => {
   try {
     const now = Math.floor(Date.now() / 1000);
     const url = `https://www.vinted.fr/api/v2/catalog/items?page=1&per_page=96&time=${now}&search_text=${searchText}`;
